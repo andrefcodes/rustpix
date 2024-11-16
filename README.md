@@ -23,5 +23,7 @@ clone this repo, `cd rustpix`, then
 ## Usage
 
 `./target/release/rustpix file.ext` for 1 file
+
 `./target/release/rustpix file1.jpeg file2.png file3.jpeg` for multiple files
+
 `./target/release/rustpix *.ext` for multiple files of the same extension
