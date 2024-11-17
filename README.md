@@ -16,14 +16,31 @@ In the future, I'll implement new functionalities.
 
 ## Build
 
-clone this repo, `cd rustpix`, then
+clone this repo
+
+`git clone https://github.com/a-franca/rustpix.git ~/.local/share/rustpix`,
+
+`cd ~/.local/share/rustpix`
 
 `cargo build --release`
 
+**Dependencies:**
+
+This program is built in Rust. For instructions on how to install it, check [Rust's offical webpage](https://www.rust-lang.org/tools/install).
+Depending on your system you may need to install additional packages like `libexif-dev` and `pkg-config`.
+
+## Add the directory to your system's PATH
+
+`echo 'export PATH="$PATH:$HOME/.local/share/rustpix/target/release"' >> ~/.bashrc`
+
+`source ~/.bashrc`
+
 ## Usage
 
-`./target/release/rustpix file.ext` for 1 file
+`rustpix file.ext` for 1 file
 
-`./target/release/rustpix file1.jpeg file2.png file3.jpeg` for multiple files
+`rustpix file1.jpeg file2.png file3.jpeg` for multiple files
 
-`./target/release/rustpix *.ext` for multiple files of the same extension
+`rustpix *.ext` for multiple files of the same extension
+
+`rustpix *` for every image inside the directory
