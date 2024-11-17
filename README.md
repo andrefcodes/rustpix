@@ -1,6 +1,6 @@
 # rustpix
 
-This is a light and simple program that automatically optimize images for web.
+This is a light and simple program that automatically optimizes images for web.
 
 Basically:
 
