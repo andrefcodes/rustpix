@@ -1,3 +1,5 @@
+[![Cargo Build & Test](https://github.com/a-franca/rustpix/actions/workflows/ci.yml/badge.svg)](https://github.com/a-franca/rustpix/actions/workflows/ci.yml)
+
 # rustpix
 
 This is a light and simple program that automatically optimizes images for web.
