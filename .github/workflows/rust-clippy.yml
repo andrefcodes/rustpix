@@ -16,7 +16,7 @@ on:
     # The branches below must be a subset of the branches above
     branches: [ $default-branch ]
   schedule:
-    - cron: '30 13 * * 1' # UTC
+    - cron: '35 10 * * 1'
 
 jobs:
   rust-clippy-analyze:
