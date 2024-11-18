@@ -1,4 +1,4 @@
-[![Cargo Build & Test](https://github.com/a-franca/rustpix/actions/workflows/ci.yml/badge.svg)](https://github.com/a-franca/rustpix/actions/workflows/ci.yml) [![Rust-clippy analyze](https://github.com/a-franca/rustpix/actions/workflows/rust-clippy.yml/badge.svg)](https://github.com/a-franca/rustpix/actions/workflows/rust-clippy.yml)
+[![Cargo Build & Test](https://github.com/a-franca/rustpix/actions/workflows/ci.yml/badge.svg)](https://github.com/a-franca/rustpix/actions/workflows/ci.yml) [![Rust-clippy analyze](https://github.com/a-franca/rustpix/actions/workflows/rust-clippy.yml/badge.svg)](https://github.com/a-franca/rustpix/actions/workflows/rust-clippy.yml) [![Release](https://github.com/a-franca/rustpix/actions/workflows/release.yml/badge.svg)](https://github.com/a-franca/rustpix/actions/workflows/release.yml)
 
 # rustpix
 
