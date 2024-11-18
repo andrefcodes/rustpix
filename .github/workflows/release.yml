@@ -1,40 +1,33 @@
-name: Release
+# .github/workflows/release.yml
 
 on:
   release:
     types: [created]
 
 jobs:
-  build:
+  release:
+    name: release ${{ matrix.target }}
     runs-on: ubuntu-latest
-
     strategy:
+      fail-fast: false
       matrix:
-        target:
-          - x86_64-unknown-linux-gnu
-          - x86_64-apple-darwin
-          - x86_64-pc-windows-gnu
-          - aarch64-unknown-linux-gnu
-          - aarch64-apple-darwin
-
+        include:
+          - target: x86_64-pc-windows-gnu
+            archive: zip
+          - target: x86_64-unknown-linux-musl
+            archive: tar.gz
+          - target: aarch64-unknown-linux-gnu
+            archive: tar.gz
+          - target: x86_64-apple-darwin
+            archive: zip
+          - target: aarch64-apple-darwin
+            archive: zip
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-
-    - name: Set up Rust
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: stable
-        target: ${{ matrix.target }}
-        override: true
-
-    - name: Build project
-      run: cargo build --release --target ${{ matrix.target }}
-
-    - name: Upload release asset
-      uses: actions/upload-release-asset@v1
-      with:
-        upload_url: ${{ github.event.release.upload_url }}
-        asset_path: target/${{ matrix.target }}/release/rustpix${{ matrix.target == 'x86_64-pc-windows-gnu' && '.exe' || '' }}
-        asset_name: rustpix-${{ matrix.target }}${{ matrix.target == 'x86_64-pc-windows-gnu' && '.exe' || '' }}
-        asset_content_type: application/octet-stream
+      - uses: actions/checkout@master
+      - name: Compile and release
+        uses: rust-build/rust-build.action@v1.4.5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          RUSTTARGET: ${{ matrix.target }}
+          ARCHIVE_TYPES: ${{ matrix.archive }}
