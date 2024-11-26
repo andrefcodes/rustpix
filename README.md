@@ -1,30 +1,98 @@
 [![Cargo Build & Test](https://github.com/a-franca/rustpix/actions/workflows/ci.yml/badge.svg)](https://github.com/a-franca/rustpix/actions/workflows/ci.yml) [![Rust-clippy analyze](https://github.com/a-franca/rustpix/actions/workflows/rust-clippy.yml/badge.svg)](https://github.com/a-franca/rustpix/actions/workflows/rust-clippy.yml) [![Release](https://github.com/a-franca/rustpix/actions/workflows/release.yml/badge.svg)](https://github.com/a-franca/rustpix/actions/workflows/release.yml)
 
-# rustpix
+# Rustpix
 
-This is a light and simple program that automatically optimizes images for web.
+## Overview
 
-Basically:
+**Rustpix** is a command-line tool that optimizes image files for the Web. It offers parallel processing for multiple files and includes some other options.
 
-- It receives an image or multiple images of any popular format like jpeg, png, ico, svg, and gif as input
-- remove all exif information from the file(s)
-- convert the file(s) to a webp lossy file(s) up to 75% quality
-- rename each file to an uuid gen 4 name.webp
-- output the new file(s) to the same directory
-- delete the original file(s)
+## Features:
 
-In the future, I'll implement new functionalities.
+- Converts images of any popular format like PNG, JPEG, GIF, BMP, ICO, TIFF, WebP, and AVIF to an optimized Webp image;
+- Strips exif information from images;
+- Processes multiple files concurrently using [Rayon](https://github.com/rayon-rs/rayon) for improved performance;
+- Keep Originals: Optional flag (-k, --keep-original) allows preserving original files;
+- Supports custom naming for output files (Defaults to UUIDv4.webp name);
+- Allows for quality selection (Defaults to 75% if none is provided).
+
+New functionalities on the way, like HEIC/HEIF support...
+
+## Download
+
+Download the binary for your system at the [Releases Page](https://github.com/a-franca/rustpix/releases) or [Build the Source Code](https://github.com/a-franca/rustpix#build) yourself.
+
+Also, see how to [add the directory to your system's path](https://github.com/a-franca/rustpix#add-the-directory-to-your-systems-path).
+
+**Note** that while the binary was compiled for other platforms, it hasn't been tested on them, but linux x86_x64.
+
+## Usage
+
+1. Convert a single file and delete the original:
+
+```bash
+rustpix file1.jpeg
+```
+
+2. Convert multiple files in parallel and delete originals:
+
+```bash
+rustpix file1.jpeg file2.png file3.bmp
+```
+
+3. Convert only files from a specific extension
+
+```bash
+rustpix *.jpeg
+```
+
+4. Convert all files whihin a directory (only compatible image files are processed)
+
+```bash
+rustpix *
+```
+
+5. Convert files while keeping the originals:
+
+```bash
+rustpix file1.jpeg file2.png -k
+```
+
+6. Specify a custom output filename base
+
+```bash
+rustpix file1.jpeg -o my_cool_name
+```
+7. Specify custom output filename base for multiple files:
+
+```bash
+rustpix file1.jpeg file2.png file3.bmp -o my_cool_name
+```
+This will output my_cool_name1.webp, my_cool_name2.webp, and my_cool_name3.webp
+
+8. Specify output image quality
+
+```bash
+rustpix file1.jpeg -q 60
+```
 
 
 ## Build
 
-clone this repo
+1. Clone this repo
 
-`git clone https://github.com/a-franca/rustpix.git ~/.local/share/rustpix`,
+```bash
+git clone https://github.com/a-franca/rustpix.git ~/.local/share/rustpix
+```
 
-`cd ~/.local/share/rustpix`
+```bash
+cd ~/.local/share/rustpix
+```
 
-`cargo build --release`
+2. Build
+
+```bash
+cargo build --release
+```
 
 **Dependencies:**
 
@@ -33,19 +101,16 @@ Depending on your system you may need to install additional packages like `libex
 
 ## Add the directory to your system's PATH
 
-`echo 'export PATH="$PATH:$HOME/.local/share/rustpix/target/release"' >> ~/.bashrc`
+```bash
+echo 'export PATH="$PATH:$HOME/.local/share/rustpix/target/release"' >> ~/.bashrc
+```
 
-`source ~/.bashrc`
+Replace path if you place your binary in a different directory.
+The same is valid for `.bashrc` if you're working with zsh or fish.
 
-## Usage
-
-`rustpix file.ext` for 1 file
-
-`rustpix file1.jpeg file2.png file3.jpeg` for multiple files
-
-`rustpix *.ext` for multiple files of the same extension
-
-`rustpix *` for every image inside the directory
+```bash
+source ~/.bashrc
+```
 
 ## License
 
