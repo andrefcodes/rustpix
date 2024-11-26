@@ -124,7 +124,7 @@ fn print_help_and_exit() {
     println!("Options:");
     println!("  -h, --help           Show this help message and exit");
     println!("  -v, --version        Show the version information and exit");
-    println!("  -o, --output         Specify the output filename (only works with a single input file)");
+    println!("  -o, --output         Specify the output filename");
     println!("  -k, --keep-original  Keep the original file after conversion");
     println!("  -q, --quality        Set the WebP quality (1-100). Default is 75.");
     println!();
