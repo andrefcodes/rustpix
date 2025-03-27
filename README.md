@@ -1,4 +1,4 @@
-[![Cargo Build & Test](https://github.com/a-franca/rustpix/actions/workflows/ci.yml/badge.svg)](https://github.com/a-franca/rustpix/actions/workflows/ci.yml) [![Rust-clippy analyze](https://github.com/a-franca/rustpix/actions/workflows/rust-clippy.yml/badge.svg)](https://github.com/a-franca/rustpix/actions/workflows/rust-clippy.yml) [![Release](https://github.com/a-franca/rustpix/actions/workflows/release.yml/badge.svg)](https://github.com/a-franca/rustpix/actions/workflows/release.yml)
+[![Cargo Build & Test](https://github.com/andrefcodes/rustpix/actions/workflows/ci.yml/badge.svg)](https://github.com/andrefcodes/rustpix/actions/workflows/ci.yml) [![Rust-clippy analyze](https://github.com/andrefcodes/rustpix/actions/workflows/rust-clippy.yml/badge.svg)](https://github.com/andrefcodes/rustpix/actions/workflows/rust-clippy.yml) [![Release](https://github.com/andrefcodes/rustpix/actions/workflows/release.yml/badge.svg)](https://github.com/andrefcodes/rustpix/actions/workflows/release.yml)
 
 # Rustpix
 
@@ -19,9 +19,9 @@ New functionalities on the way, like HEIC/HEIF support...
 
 ## Download
 
-Download the binary for your system at the [Releases Page](https://github.com/a-franca/rustpix/releases) or [Build the Source Code](https://github.com/a-franca/rustpix#build) yourself.
+Download the binary for your system at the [Releases Page](https://github.com/andrefcodes/rustpix/releases) or [Build the Source Code](https://github.com/andrefcodes/rustpix#build) yourself.
 
-Also, see how to [add the directory to your system's path](https://github.com/a-franca/rustpix#add-the-directory-to-your-systems-path).
+Also, see how to [add the directory to your system's path](https://github.com/andrefcodes/rustpix#add-the-directory-to-your-systems-path).
 
 **Note** that while the binary was compiled for other platforms, it hasn't been tested on them, but linux x86_x64.
 
@@ -81,7 +81,7 @@ rustpix file1.jpeg -q 60
 1. Clone this repo
 
 ```bash
-git clone https://github.com/a-franca/rustpix.git ~/.local/share/rustpix
+git clone https://github.com/andrefcodes/rustpix.git ~/.local/share/rustpix
 ```
 
 ```bash
@@ -114,4 +114,4 @@ source ~/.bashrc
 
 ## License
 
-This project is distributed under the terms of both the MIT license and the Apache License (Version 2.0). See [LICENSE-MIT](https://github.com/a-franca/rustpix/blob/main/LICENSE-MIT) and [LICENSE-APACHE](https://github.com/a-franca/rustpix/blob/main/LICENSE-APACHE) for details.
+This project is distributed under the terms of both the MIT license and the Apache License (Version 2.0). See [LICENSE-MIT](https://github.com/andrefcodes/rustpix/blob/main/LICENSE-MIT) and [LICENSE-APACHE](https://github.com/andrefcodes/rustpix/blob/main/LICENSE-APACHE) for details.
