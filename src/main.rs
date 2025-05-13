@@ -4,15 +4,15 @@
  *        A Command-Line Tool for Image Optimization for the Web          *
  *                                                                        *
  *  Author: Andre Franca                                                  *
- *  Repository: https://github.com/a-franca/rustpix                       *
+ *  Repository: https://github.com/andrefcodes/rustpix                    *
  *                                                                        *
  *  Licensing:                                                            *
  *  This project is dual-licensed under either of the following licenses: *
  *                                                                        *
  *  - Apache License (Version 2.0)                                        *
- *        (https://github.com/a-franca/rustpix/blob/main/LICENSE-APACHE)  *
+ *      (https://github.com/andrefcodes/rustpix/blob/main/LICENSE-APACHE  *
  *  - MIT License                                                         *
- *        (https://github.com/a-franca/rustpix/blob/main/LICENSE-MIT)     *
+ *      (https://github.com/andrefcodes/rustpix/blob/main/LICENSE-MIT)    *
  *                                                                        *
  *  You may choose either license to use this software.                   *
  *                                                                        *
