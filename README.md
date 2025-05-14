@@ -8,14 +8,12 @@
 
 ## Features:
 
-- Converts images of any popular format like PNG, JPEG, GIF, BMP, ICO, TIFF, WebP, and AVIF to an optimized Webp image;
+- Converts images of any popular format like PNG, JPEG, GIF, BMP, ICO, TIFF, and AVIF to an optimized Webp image;
 - Strips exif information from images;
 - Processes multiple files concurrently using [Rayon](https://github.com/rayon-rs/rayon) for improved performance;
 - Keep Originals: Optional flag (-k, --keep-original) allows preserving original files;
 - Supports custom naming for output files (Defaults to UUIDv4.webp name);
 - Allows for quality selection (Defaults to 75% if none is provided).
-
-New functionalities on the way, like HEIC/HEIF support...
 
 ## Download
 
