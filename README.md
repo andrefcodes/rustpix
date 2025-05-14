@@ -97,7 +97,7 @@ cargo build --release
 **Dependencies:**
 
 This program is built in Rust. For instructions on how to install it, check [Rust's offical webpage](https://www.rust-lang.org/tools/install).
-Depending on your system you may need to install additional packages like `libexif-dev` and `pkg-config`.
+Depending on your system you may need to install additional packages like `libexif-dev`, and `pkg-config`.
 
 ## Add the directory to your system's PATH
 
