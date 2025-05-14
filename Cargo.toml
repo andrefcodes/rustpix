@@ -2,7 +2,7 @@
 name = "rustpix"
 description = "It is a lightweight Rust-based tool designed to optimize images for web use"
 authors = ["Andre Franca <andre@abf.li>"]
-version = "0.1.4"
+version = "0.1.5"
 license = "MIT OR Apache-2.0"
 homepage = "https://github.com/andrefcodes/rustpix"
 repository = "https://github.com/andrefcodes/rustpix.git"
@@ -12,7 +12,7 @@ keywords = ["image", "webp", "conversion"]
 include = ["src", "README.md", "LICENSE-APACHE", "LICENSE-MIT", "LICENSES.md"]
 
 [dependencies]
-image = "0.24"  # For image processing
-uuid = { version = "1", features = ["v4"] }  # For generating UUIDs
-rayon = "1.5"  # For parallel processing
+image = "0.25.6"  # For image processing
+uuid = { version = "1.16.0", features = ["v4"] }  # For generating UUIDs
+rayon = "1.10"  # For parallel processing
 webp = "0.3.0" # For handling webp output resolution
