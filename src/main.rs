@@ -26,7 +26,7 @@
  **************************************************************************/
 
 use rayon::prelude::*;
-use image::{io::Reader as ImageReader, DynamicImage};
+use image::{ImageReader, DynamicImage};
 use std::fs::{self, File};
 use std::io::Write;
 use std::path::Path;
