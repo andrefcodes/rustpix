@@ -24,10 +24,8 @@ use std::io::Write;
 use std::path::Path;
 use uuid::Uuid;
 
-#[cfg(feature = "heif")]
 use crate::formats::heif;
 use crate::formats::webp;
-#[cfg(feature = "svg")]
 use crate::formats::svg;
 
 /// Result of image processing, containing statistics about the operation
@@ -113,7 +111,6 @@ fn is_animated_gif(file_path: &Path) -> bool {
 }
 
 /// Check if a file is an SVG
-#[cfg(feature = "svg")]
 fn is_svg_file(file_path: &Path) -> bool {
     if let Some(ext) = file_path.extension() {
         let ext_lower = ext.to_str().map(|s| s.to_lowercase());
@@ -152,29 +149,18 @@ pub fn process_image(
     }
 
     // Check for SVG - needs rasterization first
-    #[cfg(feature = "svg")]
     if is_svg_file(file_path) {
         return process_svg(file_path, options, original_size);
     }
 
     // Detect image format to determine appropriate decoding strategy
     // HEIC/HEIF files require specialized handling due to their unique format
-    #[cfg(feature = "heif")]
     let is_heif_format = heif::is_heif_format(file_path);
-    #[cfg(not(feature = "heif"))]
-    let is_heif_format = false;
 
     // Decode the image using the appropriate decoder based on format detection
     let img = if is_heif_format {
-        #[cfg(feature = "heif")]
-        {
-            // Use specialized HEIF decoder for Apple's HEIC/HEIF formats
-            heif::decode(file_path)?
-        }
-        #[cfg(not(feature = "heif"))]
-        {
-            return Err("HEIF support not compiled. Rebuild with --features heif".into());
-        }
+        // Use specialized HEIF decoder for Apple's HEIC/HEIF formats
+        heif::decode(file_path)?
     } else {
         // Use content-based format detection for standard formats (PNG, JPEG, GIF, BMP, etc.)
         // This handles files with incorrect extensions by analyzing file content instead of extension
@@ -334,7 +320,6 @@ fn process_animated_gif(
 }
 
 /// Process SVG files - rasterize and convert to WebP
-#[cfg(feature = "svg")]
 fn process_svg(
     file_path: &Path,
     options: ProcessingOptions,
