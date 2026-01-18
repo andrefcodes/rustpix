@@ -86,9 +86,20 @@ jobs:
           sudo apt-get install -y libheif-dev:arm64
       
       # --- macOS Dependencies ---
-      - name: Install dependencies (macOS)
-        if: runner.os == 'macOS'
+      - name: Install dependencies (macOS Apple Silicon)
+        if: matrix.target == 'aarch64-apple-darwin'
         run: brew install libheif pkg-config
+
+      - name: Install dependencies (macOS Intel)
+        if: matrix.target == 'x86_64-apple-darwin'
+        shell: bash
+        run: |
+          # Install vcpkg for x64-osx
+          git clone https://github.com/microsoft/vcpkg.git
+          ./vcpkg/bootstrap-vcpkg.sh
+          ./vcpkg/vcpkg install libheif:x64-osx
+          echo "VCPKG_ROOT=$GITHUB_WORKSPACE/vcpkg" >> $GITHUB_ENV
+          echo "VCPKGRS_DYNAMIC=1" >> $GITHUB_ENV
 
       # --- Windows Dependencies ---
       - name: Install dependencies (Windows)
