@@ -40,19 +40,29 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
-      - name: Install libheif (Linux)
-        if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y libheif-dev
+      - name: Install libheif (Linux x86_64)
+        if: matrix.target == 'x86_64-unknown-linux-gnu'
+        run: sudo apt-get update && sudo apt-get install -y libheif-dev pkg-config
+      - name: Install libheif (Linux ARM64)
+        if: matrix.target == 'aarch64-unknown-linux-gnu'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-aarch64-linux-gnu pkg-config
+          sudo dpkg --add-architecture arm64
+          sudo apt-get update
+          sudo apt-get install -y libheif-dev:arm64
       - name: Install libheif (macOS)
         if: runner.os == 'macOS'
-        run: brew install libheif
+        run: brew install libheif pkg-config
       - name: Install libheif (Windows)
         if: runner.os == 'Windows'
+        shell: pwsh
         run: |
           vcpkg integrate install
-          vcpkg install libheif:x64-windows
+          vcpkg install libheif:x64-windows-static-md
         env:
           VCPKG_ROOT: C:\vcpkg
+          VCPKGRS_DYNAMIC: 1
       - uses: taiki-e/upload-rust-binary-action@v1
         with:
           bin: rustpix
