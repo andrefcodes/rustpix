@@ -135,8 +135,8 @@ Download the latest release for your platform from [GitHub Releases](https://git
 | Linux x86_64 | `rustpix-*-x86_64-unknown-linux-gnu.tar.gz` |
 | Linux ARM64 | `rustpix-*-aarch64-unknown-linux-gnu.tar.gz` |
 | macOS Apple Silicon | `rustpix-*-aarch64-apple-darwin.tar.gz` |
-| macOS Intel | `rustpix-*-x86_64-apple-darwin.tar.gz` |
 | Windows x86_64 | `rustpix-*-x86_64-pc-windows-msvc.zip` |
+*Note: Pre-built binaries for macOS Intel (x86_64) are no longer provided. If you need a binary for Intel Macs, please build from source as described below.*
 
 ```bash
 # Example for Linux x86_64:
