@@ -252,9 +252,7 @@ fn print_help_and_exit() {
     println!();
     println!("Supported formats:");
     println!("  Raster: PNG, JPEG, GIF (animated), BMP, ICO, TIFF");
-    #[cfg(feature = "svg")]
     println!("  Vector: SVG");
-    #[cfg(feature = "heif")]
     println!("  Apple:  HEIC, HEIF");
     println!();
     println!("Options:");
