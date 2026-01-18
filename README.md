@@ -15,13 +15,12 @@ Unlike heavyweight tools like FFmpeg or ImageMagick, Rustpix is:
 - **Privacy-conscious** - Always strips metadata (EXIF, etc.) to protect privacy
 - **Simple to use** - Minimal command-line interface with sensible defaults
 - **Purposely minimal** - Designed to do one thing well: optimize images for the web
-- **Low dependencies** - Default build requires no system libraries (pure Rust)
 
 ## Features
 
 - **Converts images** of popular formats (PNG, JPEG, GIF, BMP, ICO, TIFF) to optimized WebP
-- **SVG support** - Rasterize vector graphics to WebP (with `svg` feature)
-- **HEIC/HEIF support** - Handle Apple device images (with `heif` feature, requires system libheif)
+- **SVG support** - Rasterize vector graphics to WebP (included by default)
+- **HEIC/HEIF support** - Handle Apple device images (included by default, requires system libheif >= 1.17)
 - **Strips all metadata** for privacy protection
 - **Parallel processing** using [Rayon](https://github.com/rayon-rs/rayon) for batch operations
 - **Progress bar** - Visual indicator for batch operations
@@ -146,14 +145,14 @@ tar -xzf rustpix-*.tar.gz
 sudo mv rustpix /usr/local/bin/
 ```
 
-> **Note:** Pre-built binaries include default features only. For SVG or HEIF support, [build from source](#option-2-build-from-source).
-
 ### Option 2: Build from Source
 
 #### Requirements
 
 - **Rust** - [Installation instructions](https://www.rust-lang.org/tools/install)
-- **For HEIF support only** - `libheif-dev` and `pkg-config` (optional)
+- **libheif-dev** >= 1.17 and **pkg-config** (for HEIF support, included by default)
+
+To build without HEIF (no system dependencies): `cargo build --release --no-default-features --features svg`
 
 #### Build Steps
 
@@ -170,8 +169,6 @@ cd ~/.local/share/rustpix
 cargo build --release
 ```
 
-**Note:** Requires `libheif >= 1.17` system library for HEIF/HEIC support.
-
 3. Install (optional)
 
 ```bash
@@ -183,18 +180,6 @@ cp target/release/rustpix ~/.local/bin/
 ## Contributing Features
 
 If you're interested in implementing any of these features or have other ideas, please open an issue on [GitHub](https://github.com/andrefcodes/rustpix/issues) or submit a pull request. See [CONTRIBUTING.md](CONTRIBUTING.md) for more information on how to contribute.
-
-## Advantages Over Other Tools
-
-While specific performance would vary by system and usage, rustpix offers several advantages when compared to more general-purpose tools:
-
-- **Parallel processing** - Processes multiple files simultaneously
-- **Focused workflow** - Optimized specifically for web image conversion
-- **Automatic metadata removal** - Always strips privacy-sensitive information
-- **Modern format support** - Handles HEIC/HEIF files from mobile devices
-- **Minimal dependencies** - Requires fewer system libraries than full image suites
-
-See [COMPARISON.md](COMPARISON.md) for more details on how rustpix compares to other tools.
 
 ## License
 
