@@ -19,8 +19,8 @@ Unlike heavyweight tools like FFmpeg or ImageMagick, Rustpix is:
 ## Features
 
 - **Converts images** of popular formats (PNG, JPEG, GIF, BMP, ICO, TIFF) to optimized WebP
-- **SVG support** - Rasterize vector graphics to WebP (included by default)
-- **HEIC/HEIF support** - Handle Apple device images (included by default, requires system libheif >= 1.17)
+- **SVG support** - Rasterize vector graphics to WebP
+- **HEIC/HEIF support** - Handle Apple device images (requires system libheif >= 1.17)
 - **Strips all metadata** for privacy protection
 - **Parallel processing** using [Rayon](https://github.com/rayon-rs/rayon) for batch operations
 - **Progress bar** - Visual indicator for batch operations
@@ -150,9 +150,7 @@ sudo mv rustpix /usr/local/bin/
 #### Requirements
 
 - **Rust** - [Installation instructions](https://www.rust-lang.org/tools/install)
-- **libheif-dev** >= 1.17 and **pkg-config** (for HEIF support, included by default)
-
-To build without HEIF (no system dependencies): `cargo build --release --no-default-features --features svg`
+- **libheif-dev** >= 1.17 and **pkg-config**
 
 #### Build Steps
 
