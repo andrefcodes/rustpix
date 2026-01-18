@@ -33,11 +33,8 @@ use walkdir::WalkDir;
 /// Supported image extensions
 const SUPPORTED_EXTENSIONS: &[&str] = &[
     "png", "jpg", "jpeg", "gif", "bmp", "ico", "tiff", "tif",
-    #[cfg(feature = "heif")]
     "heic",
-    #[cfg(feature = "heif")]
     "heif",
-    #[cfg(feature = "svg")]
     "svg",
 ];
 
