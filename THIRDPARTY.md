@@ -22,13 +22,13 @@ Rustpix uses several third-party Rust crates to provide image processing, parall
 - **Homepage**: https://github.com/jaredforth/webp
 - **Description**: Rust bindings for the libwebp library, enabling high-quality WebP image encoding and decoding with support for both lossy and lossless compression.
 
-#### libheif-rs (v1.0.0) [Optional: heif feature]
+#### libheif-rs (v2.6.1)
 - **License**: MIT
 - **Purpose**: HEIC/HEIF image format support
 - **Homepage**: https://github.com/Cykooz/libheif-rs
 - **Description**: Rust bindings for libheif, providing support for High Efficiency Image Container (HEIC) and High Efficiency Image Format (HEIF) used primarily by Apple devices. Requires system libheif >= 1.17.
 
-#### resvg (v0.46.0) [Optional: svg feature]
+#### resvg (v0.46.0)
 - **License**: MPL-2.0
 - **Purpose**: SVG rendering and rasterization
 - **Homepage**: https://github.com/RazrFalcon/resvg
