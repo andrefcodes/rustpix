@@ -1,0 +1,37 @@
+[package]
+name = "rustpix"
+description = "A command-line tool for image optimization for the web"
+authors = ["Andre Franca <andre@abf.li>"]
+version = "0.3.0-alpha.1"
+license = "AGPL-3.0-or-later"
+homepage = "https://github.com/andrefcodes/rustpix"
+repository = "https://github.com/andrefcodes/rustpix"
+documentation = "https://github.com/andrefcodes/rustpix#readme"
+categories = ["command-line-utilities", "multimedia::images"]
+readme = "README.md"
+edition = "2024"
+keywords = ["image", "webp", "conversion", "optimization", "privacy"]
+include = ["src", "README.md", "LICENSE", "LICENSES.md"]
+publish = false  # Not ready for crates.io publication
+
+[features]
+default = ["heif", "svg"]  # All features enabled by default
+heif = ["dep:libheif-rs"]  # HEIF/HEIC support (requires libheif >= 1.17 system library)
+svg = ["dep:resvg"]         # SVG rasterization support (pure Rust, no system deps)
+
+[dependencies]
+image = { version = "0.25.9", default-features = false, features = ["gif", "png", "jpeg", "bmp", "ico", "tiff", "webp", "rayon"] }
+uuid = { version = "1.19.0", features = ["v7"] }
+rayon = "1.11"
+webp = "0.3.1"
+indicatif = "0.18.3"        # Progress bars
+walkdir = "2.5"             # Directory traversal
+resvg = { version = "0.46.0", optional = true }  # SVG rendering (pure Rust)
+libheif-rs = { version = "=1.0.0", optional = true, default-features = false }  # HEIF decoding (requires system libheif >= 1.17)
+
+[profile.release]
+lto = true          # Enable Link Time Optimization
+codegen-units = 1   # Optimize for size
+opt-level = 3       # Maximum optimization
+panic = "abort"     # Abort on panic for smaller binaries
+strip = true        # Strip symbols from binary
