@@ -7,7 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [0.3.0-alpha.1] - 2025-01-15
 
 ### ⚠️ Breaking Changes
-- HEIF feature now requires system libheif >= 1.17 (embedded build removed)
+- HEIF support now requires system libheif >= 1.17 (embedded build removed)
 - UUID v4 replaced with UUID v7 (timestamp-based, sortable) for output filenames
 
 ### Added
@@ -17,13 +17,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Max size targeting** - New `-m/--max-size` flag with auto quality adjustment
   - Supports human-readable sizes: `500KB`, `2MB`, etc.
   - Uses binary search for optimal quality
-- **SVG support** - New `svg` feature for vector graphics rasterization
-  - Pure Rust via `resvg` crate (no system dependencies)
+- **SVG support** - SVG vector graphics rasterization via `resvg` crate (pure Rust)
 - **GIF detection** - Basic animated GIF detection (first frame conversion)
-- **Build features system** - Modular feature flags:
-  - `default`: All features enabled (HEIF + SVG)
-  - `svg`: SVG rasterization (pure Rust, no system deps)
-  - `heif`: HEIC/HEIF support (requires system libheif >= 1.17)
 - **Summary statistics** - Batch processing shows total savings
 - **Recursive directory processing** - New `-r/--recursive` flag to process directories
 - **Dry-run mode** - New `-n/--dry-run` flag to preview operations
@@ -38,10 +33,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   - `uuid` 1.19.0 (now using v7 instead of v4)
   - `rayon` 1.11
   - `webp` 0.3.1
-  - `libheif-rs` 1.0.0 (for 1.17 compatibility)
-  - `indicatif` 0.18.3 (new)
-  - `walkdir` 2.5 (new)
-- Improved CLI help with examples and feature-aware format list
+  - `libheif-rs` 2.6.1
+  - `resvg` 0.46.0
+  - `indicatif` 0.18.3
+  - `walkdir` 2.5
+- Improved CLI help with examples
 - Enhanced error messages with visual indicators (✓/✗)
 
 ### Fixed
