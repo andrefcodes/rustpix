@@ -92,14 +92,17 @@ jobs:
 
       - name: Install dependencies (macOS Intel)
         if: matrix.target == 'x86_64-apple-darwin'
-        shell: bash
         run: |
-          # Install vcpkg for x64-osx
-          git clone https://github.com/microsoft/vcpkg.git
-          ./vcpkg/bootstrap-vcpkg.sh
-          ./vcpkg/vcpkg install libheif:x64-osx
-          echo "VCPKG_ROOT=$GITHUB_WORKSPACE/vcpkg" >> $GITHUB_ENV
-          echo "VCPKGRS_DYNAMIC=1" >> $GITHUB_ENV
+          # Install Homebrew for x86_64 (under Rosetta)
+          NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+          
+          # Install x86_64 dependencies
+          /usr/local/bin/brew install libheif pkg-config
+          
+          # Set paths to use the x86_64 libraries
+          echo "PKG_CONFIG_PATH=/usr/local/lib/pkgconfig" >> $GITHUB_ENV
+          echo "dyld_library_path=/usr/local/lib" >> $GITHUB_ENV
+          echo "PATH=/usr/local/bin:$PATH" >> $GITHUB_ENV
 
       # --- Windows Dependencies ---
       - name: Install dependencies (Windows)
