@@ -22,9 +22,7 @@
 pub mod webp;
 
 /// HEIC/HEIF format handling - provides decoding functionality for Apple's image formats
-#[cfg(feature = "heif")]
 pub mod heif;
 
 /// SVG format handling - provides rasterization for vector graphics
-#[cfg(feature = "svg")]
 pub mod svg;
