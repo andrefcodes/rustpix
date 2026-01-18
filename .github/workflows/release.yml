@@ -64,10 +64,25 @@ jobs:
       - name: Install dependencies (Linux ARM64)
         if: matrix.target == 'aarch64-unknown-linux-gnu'
         run: |
+          sudo dpkg --add-architecture arm64
+          
+          # Restrict existing sources to amd64 to avoid arm64 404s on Azure mirrors
+          sudo sed -i 's/^deb http/deb [arch=amd64] http/g' /etc/apt/sources.list
+          sudo sed -i 's/^deb mirror/deb [arch=amd64] mirror/g' /etc/apt/sources.list
+          if [ -f /etc/apt/sources.list.d/ubuntu.sources ]; then
+             sudo sed -i 's/^Types: deb/Types: deb\nArchitectures: amd64/g' /etc/apt/sources.list.d/ubuntu.sources
+          fi
+
+          # Add Ubuntu Ports sources for ARM64
+          sudo bash -c 'cat <<EOF > /etc/apt/sources.list.d/arm64-source.list
+          deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports/ noble main restricted universe multiverse
+          deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports/ noble-updates main restricted universe multiverse
+          deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports/ noble-backports main restricted universe multiverse
+          deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports/ noble-security main restricted universe multiverse
+          EOF'
+
           sudo apt-get update
           sudo apt-get install -y gcc-aarch64-linux-gnu pkg-config
-          sudo dpkg --add-architecture arm64
-          sudo apt-get update
           sudo apt-get install -y libheif-dev:arm64
       
       # --- macOS Dependencies ---
