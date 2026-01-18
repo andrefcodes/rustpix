@@ -87,20 +87,6 @@ jobs:
         if: matrix.target == 'aarch64-apple-darwin'
         run: brew install libheif pkg-config
 
-      - name: Install dependencies (macOS Intel)
-        if: matrix.target == 'x86_64-apple-darwin'
-        run: |
-          # Install Homebrew for x86_64 (under Rosetta)
-          NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-          
-          # Install x86_64 dependencies
-          /usr/local/bin/brew install libheif pkg-config
-          
-          # Set paths to use the x86_64 libraries
-          echo "PKG_CONFIG_PATH=/usr/local/lib/pkgconfig" >> $GITHUB_ENV
-          echo "dyld_library_path=/usr/local/lib" >> $GITHUB_ENV
-          echo "PATH=/usr/local/bin:$PATH" >> $GITHUB_ENV
-
       # --- Windows Dependencies ---
       - name: Install dependencies (Windows)
         if: runner.os == 'Windows'
