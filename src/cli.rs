@@ -22,6 +22,22 @@
 // Program version, extracted from Cargo metadata.
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
+/// Output format for converted images
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum OutputFormat {
+    WebP,
+    Avif,
+}
+
+impl OutputFormat {
+    pub fn extension(&self) -> &'static str {
+        match self {
+            OutputFormat::WebP => "webp",
+            OutputFormat::Avif => "avif",
+        }
+    }
+}
+
 pub struct Args {
     /// List of input image files to process (supports wildcards when expanded by shell)
     pub files: Vec<String>,
@@ -29,7 +45,7 @@ pub struct Args {
     pub output: Option<String>,
     /// Whether to preserve original files after conversion (default: false)
     pub keep_original: bool,
-    /// WebP compression quality level, range up to 100 (default: 75)
+    /// Compression quality level, range 1-100 (default: 75)
     pub quality: f32,
     /// Maximum target file size in bytes; if set, quality will be automatically adjusted
     pub max_size: Option<u64>,
@@ -43,6 +59,10 @@ pub struct Args {
     pub verbosity: u8,
     /// Use short UUID (8 chars) for output filenames instead of full UUID
     pub short_id: bool,
+    /// Output format (webp or avif)
+    pub format: OutputFormat,
+    /// Crop dimensions (width, height) in pixels
+    pub crop: Option<(u32, u32)>,
 }
 
 /// This function processes all command-line arguments, validates them, and returns
@@ -56,13 +76,15 @@ pub fn parse_args() -> Args {
     // Initialize option variables with default values
     let mut output = None;
     let mut keep_original = false;
-    let mut quality = 75.0; // Default WebP quality (good balance of size/quality)
+    let mut quality = 75.0; // Default quality (good balance of size/quality)
     let mut max_size = None;
     let mut show_stats = false;
     let mut recursive = false;
     let mut dry_run = false;
     let mut verbosity: u8 = 1; // 0 = quiet, 1 = normal, 2 = verbose
     let mut short_id = false;
+    let mut format = OutputFormat::WebP; // Default to WebP
+    let mut crop: Option<(u32, u32)> = None;
 
     // Show usage instructions if no arguments provided (user needs guidance)
     if args.is_empty() {
@@ -165,11 +187,32 @@ pub fn parse_args() -> Args {
         args.retain(|x| x != "-r" && x != "--recursive");
     }
 
-    // Parse dry-run flag (-n or --dry-run)
+    // Parse dry-run flag (-d or --dry-run)
     // Show what would be done without actually processing files
-    if args.contains(&"-n".to_string()) || args.contains(&"--dry-run".to_string()) {
+    if args.contains(&"-d".to_string()) || args.contains(&"--dry-run".to_string()) {
         dry_run = true;
-        args.retain(|x| x != "-n" && x != "--dry-run");
+        args.retain(|x| x != "-d" && x != "--dry-run");
+    }
+
+    // Parse format option (-f or --format)
+    // Output format: webp (default) or avif
+    if let Some(pos) = args.iter().position(|x| x == "-f" || x == "--format") {
+        if pos + 1 < args.len() {
+            let format_str = args[pos + 1].to_lowercase();
+            match format_str.as_str() {
+                "webp" => format = OutputFormat::WebP,
+                "avif" => format = OutputFormat::Avif,
+                _ => {
+                    eprintln!("Error: Invalid format '{}'. Supported formats: webp, avif", format_str);
+                    std::process::exit(1);
+                }
+            }
+            args.remove(pos + 1);
+            args.remove(pos);
+        } else {
+            eprintln!("Error: Missing value after -f or --format.");
+            std::process::exit(1);
+        }
     }
 
     // Parse verbose flag (-V or --verbose)
@@ -186,11 +229,36 @@ pub fn parse_args() -> Args {
         args.retain(|x| x != "-Q" && x != "--quiet");
     }
 
-    // Parse short-id flag (--short-id)
+    // Parse short-id flag (-S or --short-id)
     // Use short UUID (8 characters) instead of full UUID for output names
-    if args.contains(&"--short-id".to_string()) {
+    if args.contains(&"-S".to_string()) || args.contains(&"--short-id".to_string()) {
         short_id = true;
-        args.retain(|x| x != "--short-id");
+        args.retain(|x| x != "-S" && x != "--short-id");
+    }
+
+    // Parse crop option (-c or --crop)
+    // Crop output to specified width and height in pixels
+    if let Some(pos) = args.iter().position(|x| x == "-c" || x == "--crop") {
+        if pos + 2 < args.len() {
+            let width_str = &args[pos + 1];
+            let height_str = &args[pos + 2];
+            match (width_str.parse::<u32>(), height_str.parse::<u32>()) {
+                (Ok(w), Ok(h)) if w > 0 && h > 0 => {
+                    crop = Some((w, h));
+                    args.remove(pos + 2);
+                    args.remove(pos + 1);
+                    args.remove(pos);
+                }
+                _ => {
+                    eprintln!("Error: Invalid crop dimensions. Width and height must be positive integers.");
+                    std::process::exit(1);
+                }
+            }
+        } else {
+            eprintln!("Error: Missing width and height after -c or --crop.");
+            eprintln!("Usage: --crop <width> <height> (e.g., --crop 650 985)");
+            std::process::exit(1);
+        }
     }
 
     // Return the parsed arguments as a structured Args object
@@ -206,6 +274,8 @@ pub fn parse_args() -> Args {
         dry_run,
         verbosity,
         short_id,
+        format,
+        crop,
     }
 }
 
@@ -229,10 +299,11 @@ fn print_usage_and_exit() {
     eprintln!("Rustpix v{} (ALPHA) - Image optimization for the web", VERSION);
     eprintln!();
     eprintln!(
-        "Usage: rustpix <file1> [file2 ...] [-o <output>] [-k] [-q <quality>] [-m <max-size>] [-s] [-r] [-n] [-V|-Q]"
+        "Usage: rustpix <file1> [file2 ...] [-o <output>] [-k] [-q <quality>] [-m <max-size>] [-f <format>] [-c <w> <h>] [-s] [-r] [-d] [-V|-Q]"
     );
     eprintln!();
-    eprintln!("Supported formats: PNG, JPEG, GIF, BMP, ICO, TIFF, SVG, HEIC, HEIF");
+    eprintln!("Supported input: PNG, JPEG, GIF, BMP, ICO, TIFF, SVG, HEIC, HEIF, WebP, AVIF");
+    eprintln!("Supported output: WebP (default), AVIF");
     eprintln!("Run with --help for more information.");
     std::process::exit(1);
 }
@@ -251,23 +322,26 @@ fn print_help_and_exit() {
     );
     println!();
     println!("Supported formats:");
-    println!("  Raster: PNG, JPEG, GIF (animated), BMP, ICO, TIFF");
+    println!("  Input:  PNG, JPEG, GIF (animated), BMP, ICO, TIFF, WebP, AVIF");
     println!("  Vector: SVG");
     println!("  Apple:  HEIC, HEIF");
+    println!("  Output: WebP (default), AVIF");
     println!();
     println!("Options:");
     println!("  -h, --help           Show this help message and exit");
     println!("  -v, --version        Show the version information and exit");
     println!("  -o, --output         Specify the output filename (without extension)");
     println!("  -k, --keep-original  Keep the original file after conversion");
-    println!("  -q, --quality        Set the WebP quality (1-100). Default is 75.");
+    println!("  -q, --quality        Set the output quality (1-100). Default is 75.");
+    println!("  -f, --format         Output format: webp (default) or avif");
+    println!("  -c, --crop <w> <h>   Crop output to width and height in pixels");
     println!("  -m, --max-size       Target maximum file size (e.g., '500KB', '2MB')");
     println!("  -s, --stats          Show compression statistics (before/after sizes)");
     println!("  -r, --recursive      Process directories recursively");
-    println!("  -n, --dry-run        Show what would be done without processing");
+    println!("  -d, --dry-run        Show what would be done without processing");
     println!("  -V, --verbose        Increase output verbosity");
     println!("  -Q, --quiet          Suppress all output except errors");
-    println!("      --short-id       Use short UUID (8 chars) for auto-generated names");
+    println!("  -S, --short-id       Use short UUID (8 chars) for auto-generated names");
     println!();
     println!("Examples:");
     println!("  rustpix image.png                    Convert to WebP with default quality");
@@ -275,8 +349,11 @@ fn print_help_and_exit() {
     println!("  rustpix photo.heic -m 500KB          Convert HEIC, target max 500KB");
     println!("  rustpix *.png -s -k                  Convert PNGs, show stats, keep originals");
     println!("  rustpix ./images -r                  Convert all images in directory tree");
-    println!("  rustpix *.jpg -n                     Dry run: show what would be converted");
-    println!("  rustpix img.png --short-id           Use short ID: abc12345.webp");
+    println!("  rustpix *.jpg -d                     Dry run: show what would be converted");
+    println!("  rustpix img.png -S                   Use short ID: abc12345.webp");
+    println!("  rustpix img.png -f avif              Convert to AVIF format");
+    println!("  rustpix photo.webp -f avif           Convert WebP to AVIF");
+    println!("  rustpix photo.jpg -c 650 985         Crop output to 650x985 pixels");
     println!();
     std::process::exit(0);
 }
