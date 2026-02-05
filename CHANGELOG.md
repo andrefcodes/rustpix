@@ -4,6 +4,26 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.4.0-alpha.1] - 2026-02-05
+
+### Added
+- **AVIF output format** - New `-f/--format` flag to choose output format (webp or avif)
+- **AVIF input support** - Can now read and convert AVIF images via libheif
+- **WebP input support** - Can now read and convert WebP images
+- **Image cropping** - New `-c/--crop <width> <height>` flag to crop output (centered)
+- **Short ID flag** - `-S` now works as short form for `--short-id`
+
+### Changed
+- **Dry-run flag** - Changed from `-n` to `-d/--dry-run`
+- Version bumped to 0.4.0-alpha.1
+- Updated dependencies:
+  - Added `ravif` 0.13 for AVIF encoding
+  - Added `rgb` 0.8 for pixel types
+  - Enabled `avif` feature in `image` crate
+
+### Removed
+- Removed ROADMAP.md (features now tracked in GitHub issues)
+
 ## [0.3.0-alpha.1] - 2025-01-15
 
 ### ⚠️ Breaking Changes
