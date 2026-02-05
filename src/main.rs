@@ -30,12 +30,14 @@ use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::Mutex;
 use walkdir::WalkDir;
 
-/// Supported image extensions
+/// Supported image extensions for input
 const SUPPORTED_EXTENSIONS: &[&str] = &[
     "png", "jpg", "jpeg", "gif", "bmp", "ico", "tiff", "tif",
     "heic",
     "heif",
     "svg",
+    "webp",
+    "avif",
 ];
 
 /// Check if a path has a supported image extension
@@ -106,6 +108,7 @@ fn main() {
     let show_stats = args.show_stats;
     let verbosity = args.verbosity;
     let dry_run = args.dry_run;
+    let format = args.format;
 
     // Dry-run mode: just show what would be done
     if dry_run {
@@ -116,9 +119,13 @@ fn main() {
         if args.recursive {
             println!("  (recursive mode enabled)");
         }
+        println!("  Output format: {}", format.extension());
         println!("  Quality: {}", args.quality);
         if let Some(max_size) = args.max_size {
             println!("  Max size: {} bytes", max_size);
+        }
+        if let Some((w, h)) = args.crop {
+            println!("  Crop: {}x{} pixels", w, h);
         }
         println!("  Keep original: {}", args.keep_original);
         return;
@@ -170,6 +177,8 @@ fn main() {
             max_size: args.max_size,
             show_stats: args.show_stats,
             short_id: args.short_id,
+            format,
+            crop: args.crop,
         };
 
         // Delegate image processing to the processing module, handling any errors that occur
