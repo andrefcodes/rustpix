@@ -2,7 +2,7 @@
 name = "rustpix"
 description = "A command-line tool for image optimization for the web"
 authors = ["Andre Franca <andre@abf.li>"]
-version = "0.3.0-alpha.1"
+version = "0.4.0-alpha.1"
 license = "AGPL-3.0-or-later"
 homepage = "https://github.com/andrefcodes/rustpix"
 repository = "https://github.com/andrefcodes/rustpix"
@@ -15,10 +15,12 @@ include = ["src", "README.md", "LICENSE", "LICENSES.md"]
 publish = false  # Not ready for crates.io publication
 
 [dependencies]
-image = { version = "0.25.9", default-features = false, features = ["gif", "png", "jpeg", "bmp", "ico", "tiff", "webp", "rayon"] }
+image = { version = "0.25.9", default-features = false, features = ["gif", "png", "jpeg", "bmp", "ico", "tiff", "webp", "avif", "rayon"] }
 uuid = { version = "1.19.0", features = ["v7"] }
 rayon = "1.11"
 webp = "0.3.1"
+ravif = { version = "0.13", default-features = false }  # AVIF encoding (pure Rust)
+rgb = "0.8"                 # RGB pixel types for ravif
 indicatif = "0.18.3"        # Progress bars
 walkdir = "2.5"             # Directory traversal
 resvg = "0.46.0"            # SVG rendering (pure Rust)
