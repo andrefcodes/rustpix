@@ -34,6 +34,18 @@ Rustpix uses several third-party Rust crates to provide image processing, parall
 - **Homepage**: https://github.com/RazrFalcon/resvg
 - **Description**: A pure Rust SVG rendering library with full CSS support and high-quality rendering. Used for converting SVG vector graphics to raster images for WebP conversion.
 
+#### ravif (v0.13)
+- **License**: BSD-3-Clause
+- **Purpose**: AVIF image encoding
+- **Homepage**: https://github.com/AV1-Community-Contributors/rav1e
+- **Description**: A pure Rust AVIF encoder built on rav1e (the AV1 encoder). Provides high-quality AVIF output format support for rustpix.
+
+#### rgb (v0.8)
+- **License**: MIT
+- **Purpose**: RGB pixel type definitions for image processing
+- **Homepage**: https://github.com/nickilous/rgb
+- **Description**: A simple crate providing RGB/RGBA pixel types used by ravif for AVIF encoding.
+
 ### Utilities
 
 #### uuid (v1.19.0)
@@ -62,14 +74,14 @@ Rustpix uses several third-party Rust crates to provide image processing, parall
 
 ## License Compatibility
 
-All dependencies use permissive licenses (MIT and/or Apache-2.0) that are compatible with our AGPL-3.0-or-later license. These licenses allow:
+All dependencies use permissive or weakly copyleft licenses (MIT, Apache-2.0, BSD-3-Clause, MPL-2.0) that are compatible with our AGPL-3.0-or-later license. These licenses allow:
 
 - Commercial use
 - Modification
 - Distribution
 - Private use
 
-The MIT and Apache-2.0 licenses are permissive and place minimal restrictions on the use of the software, making them compatible with the AGPL-3.0-or-later license used by rustpix.
+The MIT, Apache-2.0, and BSD-3-Clause licenses are permissive and place minimal restrictions on the use of the software. The MPL-2.0 (used by resvg) is a file-level copyleft license that is compatible with the AGPL-3.0-or-later license used by rustpix.
 
 ## Acknowledgments
 
@@ -302,6 +314,37 @@ SOFTWARE.
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
+```
+
+### BSD 3-Clause License
+
+```
+BSD 3-Clause License
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its
+   contributors may be used to endorse or promote products derived from
+   this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ```
 
 ---
