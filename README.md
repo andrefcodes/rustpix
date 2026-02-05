@@ -18,19 +18,21 @@ Unlike heavyweight tools like FFmpeg or ImageMagick, Rustpix is:
 
 ## Features
 
-- **Converts images** of popular formats (PNG, JPEG, GIF, BMP, ICO, TIFF) to optimized WebP
-- **SVG support** - Rasterize vector graphics to WebP
+- **Converts images** of popular formats (PNG, JPEG, GIF, BMP, ICO, TIFF, WebP, AVIF) to optimized WebP or AVIF
+- **SVG support** - Rasterize vector graphics to WebP or AVIF
 - **HEIC/HEIF support** - Handle Apple device images (requires system libheif >= 1.17)
+- **Multiple output formats** - Choose between WebP (default) or AVIF with `-f` flag
+- **Image cropping** - Crop output to specific dimensions with `-c` flag
 - **Strips all metadata** for privacy protection
 - **Parallel processing** using [Rayon](https://github.com/rayon-rs/rayon) for batch operations
 - **Progress bar** - Visual indicator for batch operations
 - **Compression statistics** - Show before/after size comparison with `-s` flag
 - **Max size targeting** - Automatically adjust quality to meet file size targets with `-m` flag
-- **Quality selection** - Customizable WebP quality (defaults to 75%)
+- **Quality selection** - Customizable quality (defaults to 75%)
 - **Recursive processing** - Process entire directory trees with `-r` flag
-- **Dry-run mode** - Preview operations without making changes with `-n` flag
+- **Dry-run mode** - Preview operations without making changes with `-d` flag
 - **Verbosity controls** - Quiet mode (`-Q`) or verbose mode (`-V`)
-- **Short IDs** - Use 8-character UUIDs for output filenames with `--short-id`
+- **Short IDs** - Use 8-character UUIDs for output filenames with `-S` or `--short-id`
 
 ## Usage
 
@@ -109,19 +111,43 @@ rustpix ./images -r
 13. Preview what would be converted (dry-run)
 
 ```bash
-rustpix ./images -r -n
+rustpix ./images -r -d
 ```
 
 14. Use short 8-character filenames
 
 ```bash
-rustpix *.png --short-id
+rustpix *.png -S
 ```
 
 15. Silent batch processing (only show errors)
 
 ```bash
 rustpix ./images -r -Q
+```
+
+16. Convert to AVIF format
+
+```bash
+rustpix image.png -f avif
+```
+
+17. Convert WebP to AVIF
+
+```bash
+rustpix photo.webp -f avif
+```
+
+18. Crop output to specific dimensions (centered)
+
+```bash
+rustpix photo.jpg -c 650 985
+```
+
+19. Combine crop with format and quality options
+
+```bash
+rustpix photo.png -c 1200 800 -f avif -q 85 -k
 ```
 
 ## Installation
