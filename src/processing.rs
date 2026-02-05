@@ -18,15 +18,17 @@
 //! This module handles decoding various image formats, converting them to WebP format
 //! with configurable quality settings, and managing file operations.
 
-use image::ImageReader;
+use image::{GenericImageView, ImageReader};
 use std::fs::{self, File};
 use std::io::Write;
 use std::path::Path;
 use uuid::Uuid;
 
+use crate::cli::OutputFormat;
+use crate::formats::avif;
 use crate::formats::heif;
-use crate::formats::webp;
 use crate::formats::svg;
+use crate::formats::webp;
 
 /// Result of image processing, containing statistics about the operation
 #[derive(Debug)]
@@ -78,6 +80,10 @@ pub struct ProcessingOptions {
     pub show_stats: bool,
     /// Use short UUID (8 characters) instead of full UUID for auto-generated names
     pub short_id: bool,
+    /// Output format (WebP or AVIF)
+    pub format: OutputFormat,
+    /// Crop dimensions (width, height) in pixels
+    pub crop: Option<(u32, u32)>,
 }
 
 /// Generate a unique identifier for output filename
@@ -90,6 +96,25 @@ fn generate_id(short: bool) -> String {
     } else {
         uuid.to_string()
     }
+}
+
+/// Crop an image to the specified dimensions, centered
+/// If the target dimensions are larger than the image, the image is not cropped
+fn crop_image(img: image::DynamicImage, target_width: u32, target_height: u32) -> image::DynamicImage {
+    let (img_width, img_height) = img.dimensions();
+    
+    // If image is smaller than target, return as-is
+    if img_width <= target_width && img_height <= target_height {
+        return img;
+    }
+    
+    // Calculate crop area (centered)
+    let crop_width = target_width.min(img_width);
+    let crop_height = target_height.min(img_height);
+    let x = (img_width - crop_width) / 2;
+    let y = (img_height - crop_height) / 2;
+    
+    img.crop_imm(x, y, crop_width, crop_height)
 }
 
 /// Check if a file is an animated GIF
@@ -169,31 +194,39 @@ pub fn process_image(
             .decode()?
     };
 
-    // Convert and encode with quality adjustment if max_size is specified
-    let (webp_data, quality_used) = if let Some(max_size) = options.max_size {
-        encode_with_size_limit(&img, options.quality, max_size)?
+    // Apply crop if specified
+    let img = if let Some((width, height)) = options.crop {
+        crop_image(img, width, height)
     } else {
-        let data = webp::encode(img, options.quality)?;
+        img
+    };
+
+    // Convert and encode with quality adjustment if max_size is specified
+    let (encoded_data, quality_used) = if let Some(max_size) = options.max_size {
+        encode_with_size_limit(&img, options.quality, max_size, options.format)?
+    } else {
+        let data = encode_image(&img, options.quality, options.format)?;
         (data, options.quality)
     };
 
     // Determine output filename based on user preference
+    let ext = options.format.extension();
     let new_file_name = if let Some(ref output) = options.output {
         // Use custom output name provided by user
-        format!("{}.webp", output)
+        format!("{}.{}", output, ext)
     } else {
         // Generate unique filename using UUID v7 (timestamp-based, sortable)
-        format!("{}.webp", generate_id(options.short_id))
+        format!("{}.{}", generate_id(options.short_id), ext)
     };
 
-    // Create full path for the new WebP file in the same directory as the original
+    // Create full path for the new file in the same directory as the original
     let new_file_path = file_path.with_file_name(&new_file_name);
 
-    // Write the encoded WebP data to the output file
+    // Write the encoded data to the output file
     let mut output_file = File::create(&new_file_path)?;
-    output_file.write_all(&webp_data)?;
+    output_file.write_all(&encoded_data)?;
 
-    let output_size = webp_data.len() as u64;
+    let output_size = encoded_data.len() as u64;
 
     // Remove original file if user hasn't requested to keep it
     if !options.keep_original {
@@ -209,29 +242,42 @@ pub fn process_image(
     })
 }
 
+/// Encode image using the specified output format
+fn encode_image(
+    img: &image::DynamicImage,
+    quality: f32,
+    format: OutputFormat,
+) -> Result<Vec<u8>, Box<dyn std::error::Error + Send + Sync>> {
+    match format {
+        OutputFormat::WebP => webp::encode(img.clone(), quality),
+        OutputFormat::Avif => avif::encode(img.clone(), quality),
+    }
+}
+
 /// Encode image with automatic quality adjustment to meet size target
 fn encode_with_size_limit(
     img: &image::DynamicImage,
     initial_quality: f32,
     max_size: u64,
+    format: OutputFormat,
 ) -> Result<(Vec<u8>, f32), Box<dyn std::error::Error + Send + Sync>> {
     let mut quality = initial_quality;
-    let mut webp_data = webp::encode(img.clone(), quality)?;
+    let mut encoded_data = encode_image(img, quality, format)?;
 
     // Binary search for optimal quality
     let mut min_quality = 1.0_f32;
     let mut max_quality = quality;
 
     // If initial quality already meets size requirement, try higher quality
-    if (webp_data.len() as u64) <= max_size {
+    if (encoded_data.len() as u64) <= max_size {
         // Already under target, but could we do better quality?
         max_quality = 100.0;
         while max_quality - quality > 1.0 {
             let try_quality = (quality + max_quality) / 2.0;
-            let try_data = webp::encode(img.clone(), try_quality)?;
+            let try_data = encode_image(img, try_quality, format)?;
             if (try_data.len() as u64) <= max_size {
                 quality = try_quality;
-                webp_data = try_data;
+                encoded_data = try_data;
             } else {
                 max_quality = try_quality;
             }
@@ -240,8 +286,8 @@ fn encode_with_size_limit(
         // Over target, need to reduce quality
         while max_quality - min_quality > 1.0 {
             quality = (min_quality + max_quality) / 2.0;
-            webp_data = webp::encode(img.clone(), quality)?;
-            if (webp_data.len() as u64) <= max_size {
+            encoded_data = encode_image(img, quality, format)?;
+            if (encoded_data.len() as u64) <= max_size {
                 min_quality = quality;
             } else {
                 max_quality = quality;
@@ -249,13 +295,13 @@ fn encode_with_size_limit(
         }
         // Final encode at the best quality that fits
         quality = min_quality;
-        webp_data = webp::encode(img.clone(), quality)?;
+        encoded_data = encode_image(img, quality, format)?;
     }
 
-    Ok((webp_data, quality))
+    Ok((encoded_data, quality))
 }
 
-/// Process animated GIF files - convert to animated WebP
+/// Process animated GIF files - convert to output format (first frame only)
 fn process_animated_gif(
     file_path: &Path,
     options: ProcessingOptions,
@@ -272,42 +318,51 @@ fn process_animated_gif(
         return Err("GIF has no frames".into());
     }
 
-    // For animated GIFs, we'll encode each frame and create an animated WebP
-    // Note: The webp crate doesn't support animated WebP encoding directly
-    // So we'll convert to a static WebP using the first frame for now
+    // For animated GIFs, we'll encode each frame and create an animated output
+    // Note: Animation encoding is not fully supported yet
+    // So we'll convert to static output using the first frame for now
     // and mark it as animated in the result
     let first_frame = &frames[0];
     let img = image::DynamicImage::ImageRgba8(first_frame.buffer().clone());
 
-    let (webp_data, quality_used) = if let Some(max_size) = options.max_size {
-        encode_with_size_limit(&img, options.quality, max_size)?
+    // Apply crop if specified
+    let img = if let Some((width, height)) = options.crop {
+        crop_image(img, width, height)
     } else {
-        let data = webp::encode(img, options.quality)?;
+        img
+    };
+
+    let (encoded_data, quality_used) = if let Some(max_size) = options.max_size {
+        encode_with_size_limit(&img, options.quality, max_size, options.format)?
+    } else {
+        let data = encode_image(&img, options.quality, options.format)?;
         (data, options.quality)
     };
 
+    let ext = options.format.extension();
     let new_file_name = if let Some(ref output) = options.output {
-        format!("{}.webp", output)
+        format!("{}.{}", output, ext)
     } else {
-        format!("{}.webp", generate_id(options.short_id))
+        format!("{}.{}", generate_id(options.short_id), ext)
     };
 
     let new_file_path = file_path.with_file_name(&new_file_name);
 
     let mut output_file = File::create(&new_file_path)?;
-    output_file.write_all(&webp_data)?;
+    output_file.write_all(&encoded_data)?;
 
-    let output_size = webp_data.len() as u64;
+    let output_size = encoded_data.len() as u64;
 
     if !options.keep_original {
         fs::remove_file(file_path)?;
     }
 
-    // Note: Currently converts animated GIF to static WebP (first frame)
-    // Full animated WebP support would require webp-animation crate
+    // Note: Currently converts animated GIF to static output (first frame)
+    // Full animated output support would require additional libraries
     eprintln!(
-        "⚠️  Note: Animated GIF converted to static WebP (first frame only). \
-         Full animation support coming soon."
+        "⚠️  Note: Animated GIF converted to static {} (first frame only). \
+         Full animation support coming soon.",
+        ext.to_uppercase()
     );
 
     Ok(ProcessingResult {
@@ -319,7 +374,7 @@ fn process_animated_gif(
     })
 }
 
-/// Process SVG files - rasterize and convert to WebP
+/// Process SVG files - rasterize and convert to output format
 fn process_svg(
     file_path: &Path,
     options: ProcessingOptions,
@@ -327,25 +382,33 @@ fn process_svg(
 ) -> Result<ProcessingResult, Box<dyn std::error::Error + Send + Sync>> {
     let img = svg::rasterize(file_path)?;
 
-    let (webp_data, quality_used) = if let Some(max_size) = options.max_size {
-        encode_with_size_limit(&img, options.quality, max_size)?
+    // Apply crop if specified
+    let img = if let Some((width, height)) = options.crop {
+        crop_image(img, width, height)
     } else {
-        let data = webp::encode(img, options.quality)?;
+        img
+    };
+
+    let (encoded_data, quality_used) = if let Some(max_size) = options.max_size {
+        encode_with_size_limit(&img, options.quality, max_size, options.format)?
+    } else {
+        let data = encode_image(&img, options.quality, options.format)?;
         (data, options.quality)
     };
 
+    let ext = options.format.extension();
     let new_file_name = if let Some(ref output) = options.output {
-        format!("{}.webp", output)
+        format!("{}.{}", output, ext)
     } else {
-        format!("{}.webp", generate_id(options.short_id))
+        format!("{}.{}", generate_id(options.short_id), ext)
     };
 
     let new_file_path = file_path.with_file_name(&new_file_name);
 
     let mut output_file = File::create(&new_file_path)?;
-    output_file.write_all(&webp_data)?;
+    output_file.write_all(&encoded_data)?;
 
-    let output_size = webp_data.len() as u64;
+    let output_size = encoded_data.len() as u64;
 
     if !options.keep_original {
         fs::remove_file(file_path)?;

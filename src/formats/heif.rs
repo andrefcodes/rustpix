@@ -13,11 +13,11 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-//! HEIC/HEIF decoding functionality.
+//! HEIC/HEIF/AVIF decoding functionality.
 //!
-//! This module provides specialized decoding for Apple's HEIC and HEIF image formats.
-//! It handles format detection through file extensions and magic number validation,
-//! then uses libheif for actual decoding operations.
+//! This module provides specialized decoding for Apple's HEIC and HEIF image formats,
+//! as well as AVIF images. It handles format detection through file extensions and
+//! magic number validation, then uses libheif for actual decoding operations.
 
 use image::{DynamicImage, ImageBuffer, Rgb};
 use libheif_rs::{ColorSpace, HeifContext, LibHeif, RgbChroma};
@@ -26,12 +26,12 @@ use std::fs::File;
 use std::io::Read;
 use std::path::Path;
 
-/// Determines if a file is in HEIC/HEIF format using a two-stage detection process:
+/// Determines if a file is in HEIC/HEIF/AVIF format using a two-stage detection process:
 /// 1. Primary check: Reads file header to verify format signature (most reliable)
-/// 2. Fallback check: Examines file extension for common HEIC/HEIF extensions
+/// 2. Fallback check: Examines file extension for common HEIC/HEIF/AVIF extensions
 ///
 /// The function looks for the 'ftyp' box signature at byte offset 4, which is
-/// characteristic of ISO Base Media File Format (used by HEIC/HEIF).
+/// characteristic of ISO Base Media File Format (used by HEIC/HEIF/AVIF).
 /// Content validation is prioritized over file extensions to prevent misidentification
 /// of files with incorrect extensions.
 ///
@@ -39,14 +39,14 @@ use std::path::Path;
 /// * `file_path` - Path to the image file to be analyzed
 ///
 /// # Returns
-/// * `true` - File is confirmed to be in HEIC/HEIF format
-/// * `false` - File is not in HEIC/HEIF format or cannot be determined
+/// * `true` - File is confirmed to be in HEIC/HEIF/AVIF format
+/// * `false` - File is not in HEIC/HEIF/AVIF format or cannot be determined
 pub fn is_heif_format(file_path: &Path) -> bool {
-    // Check if file has the expected HEIC/HEIF extension
+    // Check if file has the expected HEIC/HEIF/AVIF extension
     let has_heif_extension = if let Some(ext) = file_path.extension() {
         if let Some(ext_str) = ext.to_str() {
             let ext_lower = ext_str.to_lowercase();
-            ext_lower == "heic" || ext_lower == "heif"
+            ext_lower == "heic" || ext_lower == "heif" || ext_lower == "avif"
         } else {
             false
         }
@@ -54,17 +54,19 @@ pub fn is_heif_format(file_path: &Path) -> bool {
         false
     };
 
-    // Check if file has valid HEIC/HEIF content signature
+    // Check if file has valid HEIC/HEIF/AVIF content signature
     let has_heif_content = if let Ok(mut file) = File::open(file_path) {
         let mut header = [0; 12]; // Read first 12 bytes for format detection
         if file.read_exact(&mut header).is_ok() {
-            // HEIC/HEIF files follow ISO Base Media File Format with 'ftyp' box at offset 4
+            // HEIC/HEIF/AVIF files follow ISO Base Media File Format with 'ftyp' box at offset 4
             if &header[4..8] == b"ftyp" {
-                // Check for HEIF-compatible brand identifiers in the ftyp box
+                // Check for HEIF/AVIF-compatible brand identifiers in the ftyp box
                 let brand = &header[8..12];
                 // 'heic' = HEIC images, 'heix' = HEIC image sequences
                 // 'hevc' = HEVC codec, 'mif1' = Media Independent Format
+                // 'avif' = AVIF images, 'avis' = AVIF image sequences
                 brand == b"heic" || brand == b"heix" || brand == b"hevc" || brand == b"mif1"
+                    || brand == b"avif" || brand == b"avis"
             } else {
                 false
             }
@@ -80,7 +82,7 @@ pub fn is_heif_format(file_path: &Path) -> bool {
     has_heif_content && has_heif_extension
 }
 
-/// This function handles the complete HEIC/HEIF decoding pipeline:
+/// This function handles the complete HEIC/HEIF/AVIF decoding pipeline:
 /// 1. Reads the binary file data into memory
 /// 2. Creates a libheif context for parsing the HEIF container
 /// 3. Extracts the primary image from the container (HEIF can contain multiple images)
@@ -88,7 +90,7 @@ pub fn is_heif_format(file_path: &Path) -> bool {
 /// 5. Converts the decoded data into Rust's standard image representation
 ///
 /// # Arguments
-/// * `path` - Filesystem path to the HEIC/HEIF image file
+/// * `path` - Filesystem path to the HEIC/HEIF/AVIF image file
 ///
 /// # Returns
 /// * `Ok(DynamicImage)` - Successfully decoded image ready for further processing
@@ -96,12 +98,13 @@ pub fn is_heif_format(file_path: &Path) -> bool {
 ///
 /// # System Requirements
 /// * libheif must be installed on the system (libheif >= 1.17)
+/// * For AVIF support, libheif must be compiled with AV1 codec support (e.g., libdav1d)
 /// * Sufficient memory to load the entire image into RAM during decoding
 ///
 /// # Errors
 /// This function will return an error if:
 /// * File cannot be read (permissions, missing file, etc.)
-/// * File is corrupted or not a valid HEIC/HEIF format
+/// * File is corrupted or not a valid HEIC/HEIF/AVIF format
 /// * libheif fails to decode the image (unsupported codec, etc.)
 /// * System runs out of memory during decoding
 pub fn decode(path: &Path) -> Result<DynamicImage, Box<dyn Error + Send + Sync>> {

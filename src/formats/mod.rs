@@ -18,8 +18,11 @@
 //! This module organizes and exports all image format-specific functionality.
 //! It serves as the central registry for format decoders and encoders.
 
-/// WebP format handling - provides encoding functionality for the primary output format
+/// WebP format handling - provides encoding functionality for WebP output format
 pub mod webp;
+
+/// AVIF format handling - provides encoding functionality for AVIF output format
+pub mod avif;
 
 /// HEIC/HEIF format handling - provides decoding functionality for Apple's image formats
 pub mod heif;
