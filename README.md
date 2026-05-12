@@ -185,7 +185,7 @@ sudo mv rustpix /usr/local/bin/
 1. Clone this repo
 
 ```bash
-git clone https://github.com/andrefcodes/rustpix ~/.local/share/rustpix
+git clone https://codeberg.org/abf/rustpix.git ~/.local/share/rustpix
 cd ~/.local/share/rustpix
 ```
 
@@ -205,7 +205,7 @@ cp target/release/rustpix ~/.local/bin/
 
 ## Contributing Features
 
-If you're interested in implementing any of these features or have other ideas, please open an issue on [GitHub](https://github.com/andrefcodes/rustpix/issues) or submit a pull request. See [CONTRIBUTING.md](CONTRIBUTING.md) for more information on how to contribute.
+If you're interested in implementing any of these features or have other ideas, please open an issue on [Codeberg](https://codeberg.org/abf/rustpix/issues) or submit a pull request. See [CONTRIBUTING.md](CONTRIBUTING.md) for more information on how to contribute.
 
 ## License
 
